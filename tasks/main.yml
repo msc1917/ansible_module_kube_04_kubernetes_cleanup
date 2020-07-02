@@ -1,5 +1,4 @@
 ---
-
 - name: Remove k3s
   include_tasks: k3s-cleanup.yml
   when: 
