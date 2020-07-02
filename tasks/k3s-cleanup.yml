@@ -1,0 +1,74 @@
+---
+- name: Check if Service Exists (master)
+  stat:
+    path: "{{ k3s.systemd_dir }}/k3s-node.service"
+  become: yes
+  register: service_k3s_node
+
+- name: Disable and check K3s service (node)
+  systemd:
+    name: k3s-node
+    daemon_reload: yes
+    state: stopped
+    enabled: no
+  become: yes
+  when:
+    - k8s_node is defined
+    - k8s_node in [ "become_master", "node" ]
+    - service_k3s_node.stat.exists
+
+- name: Remove K3s service file (node)
+  file:
+    dest: "{{ k3s.systemd_dir }}/k3s-node.service"
+    state: absent
+  become: yes
+  when:
+    - k8s_node is defined
+    - k8s_node in [ "become_master", "node" ]
+
+- name: Check if Service Exists (master)
+  stat:
+    path: "{{ k3s.systemd_dir }}/k3s-master.service"
+  become: yes
+  register: service_k3s_master
+
+- name: Disable and check K3s service (master)
+  systemd:
+    name: k3s-master
+    daemon_reload: yes
+    state: stopped
+    enabled: no
+  become: yes
+  when:
+    - k8s_node is defined
+    - k8s_node == "install_master"
+    - service_k3s_master.stat.exists
+   
+- name: Remove K3s service file (master)
+  file:
+    dest: "{{ k3s.systemd_dir }}/k3s-master.service"
+    state: absent
+  become: yes
+  when:
+    - k8s_node is defined
+    - k8s_node == "install_master"
+
+- name: Remove k3s Group
+  group:
+    name: "{{ k3s.os_user.group }}"
+    gid: "{{ k3s.os_user.gid }}"
+    state: absent
+  become: yes
+
+- name: Remove k3s User
+  user:
+    name: "{{ k3s.os_user.user }}"
+    uid: "{{ k3s.os_user.uid }}"
+    state: absent
+  become: yes
+
+- name: Remove home-directory of user k3s
+  file:
+    path: "/home/{{ k3s.os_user.user }}"
+    state: absent
+  become: yes

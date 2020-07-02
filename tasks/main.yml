@@ -1,0 +1,53 @@
+---
+
+- name: Remove k3s
+  include_tasks: k3s-cleanup.yml
+  when: 
+    - k8s_node is defined
+    - serveNet_ip is defined
+    - kubernetes_engine is defined
+    - kubernetes_reinstall is defined
+    - k8s_node in [ "install_master", "become_master", "node" ]
+    - kubernetes_engine != "k3s" or kubernetes_reinstall
+
+- name: Remove rke
+  include_tasks: rke-cleanup.yml
+  when: 
+    - k8s_node is defined
+    - serveNet_ip is defined
+    - kubernetes_engine is defined
+    - kubernetes_reinstall is defined
+    - k8s_node in [ "install_master", "become_master", "node" ]
+    - kubernetes_engine != "rke" or kubernetes_reinstall
+
+- name: Remove kubeadm
+  include_tasks: kubeadm-cleanup.yml
+  when: 
+    - k8s_node is defined
+    - serveNet_ip is defined
+    - kubernetes_engine is defined
+    - kubernetes_reinstall is defined
+    - k8s_node in [ "install_master", "become_master", "node" ]
+    - kubernetes_engine != "kubeadm" or kubernetes_reinstall
+
+- name: Remove minikube
+  include_tasks: minikube-cleanup.yml
+  when: 
+    - k8s_node is defined
+    - serveNet_ip is defined
+    - kubernetes_engine is defined
+    - kubernetes_reinstall is defined
+    - k8s_node in [ "install_master", "become_master", "node" ]
+    - kubernetes_engine != "minikube" or kubernetes_reinstall
+
+- name: Shutdown all docker-containers
+  shell: "docker stop $(docker ps -a -q)"
+  ignore_errors: yes
+  when:
+    - kubernetes_reinstall
+
+- name: Remove all docker-containers
+  shell: "docker rm $(docker ps -a -q)"
+  ignore_errors: yes
+  when:
+    - kubernetes_reinstall

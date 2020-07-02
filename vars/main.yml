@@ -1,0 +1,46 @@
+helm:      { version: 'v3.0.3' }
+
+k3s:      { os_user: { 
+              comment: "r3s User",
+              user: "k3s",
+              uid: 1197,
+              group: "k3s",
+              gid: 1197,
+              groups: [ "docker", "sudo-nopwd" ]
+              },
+            systemd_dir: '/etc/systemd/system' }
+
+rke:      { os_user: { 
+              comment: "rke User",
+              user: "rke",
+              uid: 1196,
+              group: "rke",
+              gid: 1196,
+              groups: [ "docker", "sudo-nopwd" ]
+              } 
+            }
+
+kubeadm:  { os_user: { 
+              comment: "Kubernetes User",
+              user: "kube",
+              uid: 1195,
+              group: "kube",
+              gid: 1195,
+              groups: [ "docker", "sudo-nopwd" ]
+              } 
+            }
+
+minikube: { os_user: { 
+              comment: "Minikube User",
+              user: "minikube",
+              uid: 1198,
+              group: "minikube",
+              gid: 1198,
+              groups: [ "docker", "sudo-nopwd" ]
+              } 
+            }
+
+helm_repositories:
+  - { repo: "rancher-latest", link: "https://releases.rancher.com/server-charts/latest" }
+  - { repo: "rancher-stable", link: "https://releases.rancher.com/server-charts/stable" }
+  - { repo: "stable",         link: "https://kubernetes-charts.storage.googleapis.com/" }

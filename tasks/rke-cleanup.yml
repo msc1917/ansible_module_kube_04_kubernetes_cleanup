@@ -1,0 +1,20 @@
+---
+- name: Remove rke User
+  user:
+    name: "{{ rke.os_user.user }}"
+    uid: "{{ rke.os_user.uid }}"
+    state: absent
+  become: yes
+
+- name: Remove rke Group
+  group:
+    name: "{{ rke.os_user.group }}"
+    gid: "{{ rke.os_user.gid }}"
+    state: absent
+  become: yes
+
+- name: Remove home-directory of user rke
+  file:
+    path: "/home/{{ rke.os_user.user }}"
+    state: absent
+  become: yes

@@ -1,0 +1,44 @@
+---
+- name: Shut down existing kubernetes-cluster (node)
+  shell: 
+    cmd: "/usr/bin/kubeadm reset --force"
+    removes: "/etc/kubernetes/kubelet.conf"
+  become: yes
+  when:
+    - k8s_node is defined
+    - k8s_node in [ "become_master", "node" ]
+
+- name: Shut down existing kubernetes-cluster (master)
+  shell: 
+    cmd: "/usr/bin/kubeadm reset --force"
+    removes: "/etc/kubernetes/admin.conf"
+  become: yes
+  when:
+    - k8s_node is defined
+    - k8s_node == "install_master"
+
+- name: Remove kubeadm User
+  user:
+    name: "{{ kubeadm.os_user.user }}"
+    uid: "{{ kubeadm.os_user.uid }}"
+    state: absent
+  become: yes
+
+- name: Remove kubeadm Group
+  group:
+    name: "{{ kubeadm.os_user.group }}"
+    gid: "{{ kubeadm.os_user.gid }}"
+    state: absent
+  become: yes
+
+- name: Remove home-directory of user kubeadm
+  file:
+    path: "/home/{{ kubeadm.os_user.user }}"
+    state: absent
+  become: yes
+
+- name: Remove bash-completion /etc/bash_completion.d/kubectl
+  file:
+    path: "/etc/bash_completion.d/kubectl"
+    state: absent
+  become: yes
